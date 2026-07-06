@@ -1,0 +1,11 @@
+.env
+.git
+__pycache__/
+*.pyc
+*.log
+.pytest_cache/
+hireflow_dev.db
+uploads/
+NusantraJobs/
+ajk_media/
+*.docx
