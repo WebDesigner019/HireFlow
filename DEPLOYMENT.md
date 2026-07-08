@@ -2,7 +2,7 @@
 
 ## Required Production Environment
 
-Set these on Alibaba Cloud ECS or Function Compute. Do not bake them into the image.
+Set these on Alibaba Cloud ECS or Function Compute for the backend. Do not bake them into the image.
 
 ```env
 DASHSCOPE_ENABLED=false
@@ -16,6 +16,12 @@ OSS_ACCESS_KEY_SECRET=
 ```
 
 Use `DASHSCOPE_ENABLED=true` only after the DashScope account quota/payment setting is fixed.
+
+Set this on the frontend host at build time:
+
+```env
+VITE_API_BASE_URL=https://your-public-backend-domain.example
+```
 
 ## Local Verification
 
@@ -37,5 +43,6 @@ docker run --env-file .env -p 8000:8000 hireflow-backend
 3. Configure DashScope key and enable `DASHSCOPE_ENABLED=true` only when quota works.
 4. Configure OSS variables if real resume file storage is needed.
 5. Deploy container to ECS or Function Compute.
-6. Run `scripts/smoke_contract.py` against the public backend URL.
-7. Record hackathon proof: live request to deployed backend plus code showing DashScope call.
+6. Deploy the frontend with `VITE_API_BASE_URL` pointing at the public backend URL.
+7. Run `scripts/smoke_contract.py` against the public backend URL.
+8. Record hackathon proof: live request to deployed backend plus code showing DashScope call.

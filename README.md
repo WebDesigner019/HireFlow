@@ -15,11 +15,22 @@ HireFlow automates the hiring pipeline from intake to matching to human-reviewed
 
 ## Local Development
 
+Backend:
+
 ```bash
 python -m venv venv
 venv\Scripts\activate
 pip install -r requirements.txt
 python -m uvicorn main:app --reload
+```
+
+Frontend:
+
+```bash
+cd frontend
+npm install
+copy .env.example .env
+npm run dev
 ```
 
 API docs are available at:
@@ -44,6 +55,12 @@ OSS_ACCESS_KEY_SECRET=
 ```
 
 Keep `.env` private. It is ignored by git.
+
+For the frontend, copy `frontend/.env.example` to `frontend/.env` and set:
+
+```env
+VITE_API_BASE_URL=http://127.0.0.1:8000
+```
 
 ## Main Endpoints
 

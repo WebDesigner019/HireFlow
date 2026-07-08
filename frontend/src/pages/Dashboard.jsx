@@ -4,6 +4,8 @@ import { Bot, Clock, FileCheck2, Hourglass, Percent, RotateCcw, Upload, UsersRou
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { StatCard } from "@/components/dashboard/StatCard";
 import { ApprovalRateChart, ApprovalTrendChart, CandidatesByMatchChart, PipelineFunnelChart } from "@/components/charts/DashboardCharts";
 import { useGovernance } from "@/context/GovernanceContext";
@@ -11,7 +13,7 @@ import { formatDateTime, formatPercent } from "@/lib/utils";
 import hireflowLogo from "@/assets/hireflow-logo.jpeg";
 
 export default function Dashboard() {
-  const { candidates, auditLog } = useGovernance();
+  const { candidates, auditLog, integrationStatus, selectedJob, createCandidateFromInput, createJobFromInput } = useGovernance();
   const avgConfidence = Math.round((candidates.reduce((sum, item) => sum + item.confidence, 0) / candidates.length) * 100);
   const pending = candidates.filter((candidate) => candidate.status.includes("Pending")).length;
   const overrides = auditLog.filter((event) => event.humanOverride).length;
@@ -39,7 +41,12 @@ export default function Dashboard() {
               <span className="rounded-full bg-amber-50 px-3 py-1.5 text-amber-700 ring-1 ring-amber-100">Every decision is explainable</span>
             </div>
             <div className="mt-6">
-              <QuickActions />
+              <QuickActions
+                integrationStatus={integrationStatus}
+                selectedJob={selectedJob}
+                onCreateCandidate={createCandidateFromInput}
+                onCreateJob={createJobFromInput}
+              />
             </div>
           </div>
         </div>
@@ -112,22 +119,102 @@ export default function Dashboard() {
   );
 }
 
-function QuickActions() {
+function QuickActions({ integrationStatus, selectedJob, onCreateCandidate, onCreateJob }) {
   const navigate = useNavigate();
+  const [jobTitle, setJobTitle] = useState("Senior Backend Engineer");
+  const [jobDescription, setJobDescription] = useState("Python FastAPI Docker PostgreSQL 5+ years experience");
+  const [candidateText, setCandidateText] = useState("Alex Morgan\nPython FastAPI PostgreSQL Docker\n5 years experience\nBSc Computer Science");
   const [message, setMessage] = useState("");
-  const simulateUpload = (kind) => {
-    setMessage(`${kind} uploaded. AI parsing and ranking refreshed for this hiring workflow.`);
-    window.setTimeout(() => setMessage(""), 3200);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const showMessage = (value) => {
+    setMessage(value);
+    window.setTimeout(() => setMessage(""), 3600);
+  };
+
+  const submitJob = async () => {
+    if (!jobTitle.trim() || !jobDescription.trim()) {
+      showMessage("Add a job title and requirements before parsing.");
+      return;
+    }
+    setIsSubmitting(true);
+    try {
+      const job = await onCreateJob({ title: jobTitle.trim(), description: jobDescription.trim() });
+      showMessage(`${job.title} parsed and shortlist refreshed.`);
+    } catch (error) {
+      showMessage(`Backend job intake failed: ${error.message}`);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const submitCandidate = async () => {
+    if (!candidateText.trim()) {
+      showMessage("Paste candidate resume text before parsing.");
+      return;
+    }
+    setIsSubmitting(true);
+    try {
+      const candidate = await onCreateCandidate({ rawText: candidateText.trim() });
+      showMessage(`${candidate.name} parsed and ranking refreshed.`);
+    } catch (error) {
+      showMessage(`Backend candidate intake failed: ${error.message}`);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
-    <div className="relative flex flex-wrap items-center gap-2">
-      <Button variant="outline" onClick={() => simulateUpload("Resume")}><Upload className="h-4 w-4" />Upload Resume</Button>
-      <Button onClick={() => simulateUpload("Job description")}><Upload className="h-4 w-4" />Upload JD</Button>
-      <Button variant="outline" onClick={() => navigate("/approval")}>Review Queue</Button>
-      <Button variant="outline" onClick={() => navigate("/audit")}>View Audit</Button>
+    <div className="relative grid gap-3">
+      <div className="flex flex-wrap items-center gap-2">
+        <Badge variant={integrationStatus?.startsWith("Connected") ? "green" : "amber"}>
+          {integrationStatus}
+        </Badge>
+        <Button variant="outline" onClick={() => navigate("/approval")}>Review Queue</Button>
+        <Button variant="outline" onClick={() => navigate("/audit")}>View Audit</Button>
+      </div>
+      <div className="grid gap-3 xl:grid-cols-2">
+        <div className="rounded-xl border border-slate-200 bg-white p-3">
+          <div className="mb-2 flex items-center justify-between gap-3">
+            <p className="text-sm font-bold text-slate-950">Job Intake</p>
+            <Badge variant="blue">{selectedJob?.title || "No active role"}</Badge>
+          </div>
+          <Input
+            value={jobTitle}
+            onChange={(event) => setJobTitle(event.target.value)}
+            placeholder="Job title"
+            aria-label="Job title"
+          />
+          <Textarea
+            className="mt-2 min-h-20"
+            value={jobDescription}
+            onChange={(event) => setJobDescription(event.target.value)}
+            placeholder="Paste job requirements"
+            aria-label="Job requirements"
+          />
+          <Button className="mt-2 w-full" onClick={submitJob} disabled={isSubmitting}>
+            <Upload className="h-4 w-4" />Parse Job
+          </Button>
+        </div>
+        <div className="rounded-xl border border-slate-200 bg-white p-3">
+          <div className="mb-2 flex items-center justify-between gap-3">
+            <p className="text-sm font-bold text-slate-950">Candidate Intake</p>
+            <Badge variant="slate">Draft and log only</Badge>
+          </div>
+          <Textarea
+            className="min-h-[142px]"
+            value={candidateText}
+            onChange={(event) => setCandidateText(event.target.value)}
+            placeholder="Paste candidate resume text"
+            aria-label="Candidate resume text"
+          />
+          <Button className="mt-2 w-full" variant="outline" onClick={submitCandidate} disabled={isSubmitting}>
+            <Upload className="h-4 w-4" />Parse Candidate
+          </Button>
+        </div>
+      </div>
       {message ? (
-        <div className="absolute right-0 top-12 z-10 w-72 rounded-xl border border-green-200 bg-green-50 p-3 text-sm font-semibold text-green-900 shadow-soft">
+        <div className="absolute right-0 top-10 z-10 w-80 rounded-xl border border-green-200 bg-green-50 p-3 text-sm font-semibold text-green-900 shadow-soft">
           {message}
         </div>
       ) : null}
