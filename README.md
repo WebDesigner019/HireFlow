@@ -4,6 +4,13 @@ Recruiter Autopilot Agent built for the Qwen Cloud Global AI Hackathon, Track 4.
 
 HireFlow automates the hiring pipeline from intake to matching to human-reviewed decisions. It parses job postings and candidate profiles, ranks candidates with visible reasoning, requires a human approval checkpoint before any candidate-facing action, drafts interview invites on approval, generates skill-gap feedback on rejection, and records every agent action in an audit log.
 
+## Live Demo
+
+- App: http://147.139.198.24
+- API health: http://147.139.198.24/api/health
+- API docs: http://147.139.198.24/docs
+- Deployment: Alibaba Cloud ECS, ApsaraDB RDS PostgreSQL, Alibaba Cloud OSS, and Qwen via DashScope.
+
 ## Core Principles
 
 - Human approval is mandatory before approve, reject, or schedule outcomes.
@@ -62,6 +69,12 @@ For the frontend, copy `frontend/.env.example` to `frontend/.env` and set:
 VITE_API_BASE_URL=http://127.0.0.1:8000
 ```
 
+For the deployed Alibaba ECS build, the frontend is served by Nginx and uses:
+
+```env
+VITE_API_BASE_URL=/api
+```
+
 ## Main Endpoints
 
 - `POST /jobs`
@@ -87,4 +100,6 @@ python scripts/reset_demo_db.py
 
 ## Deployment
 
-See `DEPLOYMENT.md` for Docker, Alibaba Cloud, RDS/Postgres, CORS, and DashScope deployment notes.
+The current hackathon deployment is live on Alibaba ECS at `http://147.139.198.24`.
+
+See `DEPLOYMENT.md` for Alibaba Cloud, RDS/Postgres, CORS, Nginx, and DashScope deployment notes.
