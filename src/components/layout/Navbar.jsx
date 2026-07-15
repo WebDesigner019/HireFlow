@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { NavLink } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
-import { Bell, BriefcaseBusiness, ChevronDown, Menu, Search, Sparkles, X } from "lucide-react";
+import { Bell, BriefcaseBusiness, ChevronDown, Menu, Search, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -90,8 +90,8 @@ export function Navbar() {
             <motion.aside className="fixed inset-y-0 left-0 z-50 w-80 max-w-[86vw] bg-white p-4 shadow-2xl lg:hidden" initial={{ x: "-100%" }} animate={{ x: 0 }} exit={{ x: "-100%" }}>
               <div className="mb-6 flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary text-white">
-                    <Sparkles className="h-5 w-5" />
+                  <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-xl border border-slate-200 bg-white">
+                    <img src="/favicon.jpeg" alt="HireFlow logo" className="h-full w-full scale-150 object-cover" />
                   </div>
                   <div>
                     <p className="font-bold text-slate-950">HireFlow</p>
