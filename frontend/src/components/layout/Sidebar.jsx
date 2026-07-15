@@ -7,7 +7,6 @@ import {
   FileClock,
   LayoutDashboard,
   Settings,
-  Sparkles,
   UsersRound
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -27,8 +26,8 @@ export function Sidebar() {
   return (
     <aside className="fixed inset-y-0 left-0 z-30 hidden w-72 border-r border-slate-200 bg-white/90 px-4 py-5 shadow-sm backdrop-blur lg:flex lg:flex-col">
       <div className="mb-8 flex items-center gap-3 px-2">
-        <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary text-white shadow-lift">
-          <Sparkles className="h-5 w-5" />
+        <div className="flex h-11 w-11 items-center justify-center overflow-hidden rounded-xl border border-slate-200 bg-white shadow-lift">
+          <img src="/favicon.jpeg" alt="HireFlow logo" className="h-full w-full scale-150 object-cover" />
         </div>
         <div>
           <p className="text-lg font-bold text-slate-950">HireFlow</p>
